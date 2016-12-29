@@ -1,5 +1,6 @@
 # Site navigation links
 
+
 - title: Home
   url: /
 
@@ -8,6 +9,9 @@
 
 - title: Technology
   url: /technology/
+
+- title: About Me
+  url: /about/
 
 - title: Search
   url: /search/
