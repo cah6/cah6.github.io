@@ -21,10 +21,10 @@ or forget why I found it difficult in the first place. This post will cover:
 
 I will assume basic knowledge of Nix (i.e. [this](https://learnxinyminutes.com/docs/nix/) makes sense to you)
 and some basic knowledge of the Haskell ecosystem (but not much). Knowing 
-information from project0 and project1 of https://github.com/Gabriel439/haskell-nix 
+information from project0 and project1 of <https://github.com/Gabriel439/haskell-nix> 
 is also probably useful. I will try to provide full in-line examples wherever possible 
-so you can follow along; if you get stuck, the full end code can be found [here](https://github.com/cah6/haskell-nix-skeleton-1). Note that any time
-I change the `release.nix` derivation, I'll make a new file. 
+so you can follow along; if you get stuck, the end code, with intermediate steps, can 
+be found [here](https://github.com/cah6/haskell-nix-skeleton-1).
 
 ## Setup
 We're going to use a cabal file that's pretty basic but has a few extra dependencies
@@ -49,6 +49,8 @@ executable nix-test
 ```
 Then you'll want to do a `cabal2nix . > default.nix` to generate a derivation from that. 
 Remember to run cabal2nix any time you change your cabal file!
+
+Note that by default, Nix will require a LICENSE file for your project.
 
 ## Pinning your haskell packages
 The absolute minimum derivation, which we'll be building on (call it `release.nix`), is as follows:
@@ -110,10 +112,12 @@ which version of a given dependency is pinned.
 
 ## Setting GHC version
 
-But which version of GHC are we using? One way would be to search for "base" and 
-backtrack to the version of GHC from that.
-My favorite way is via `nix repl`, made easier by the fact that we extracted our pinning function
-to its own file. Since "haskellPackages" is an alias for "haskell.packages.<default-ghc-version>",
+But which version of GHC are we using? One way would be to search for `"base"` (with the quotes) and 
+backtrack to the version of GHC from that 
+(GHC [release notes](https://downloads.haskell.org/~ghc/master/users-guide/8.6.1-notes.html#included-libraries) show included library versions).
+
+Instead, my favorite way is via `nix repl`, made easier by the fact that we extracted our pinning function
+to its own file. Since `haskellPackages` is an alias for `haskell.packages.<default-ghc-version>`,
 we can do the following:
 
 ```bash
@@ -155,7 +159,7 @@ these derivations will be built:
   /nix/store/4wvwj5rqkj3kxwmbl10p3ridarfp1djl-ghc-8.4.3
   /nix/store/vmrgjlzdvrk2aii6m0fn3rwajckrpwpx-ghc-8.4.3-doc
 ```
-Whoa whoa whoa, we don't want to BUILD all that. I'm not sure exactly why this happens, but 
+Whoa whoa whoa, we don't want to BUILD all that -- that would take forever. I'm not sure exactly why this happens, but 
 my guess is that the only haskell packages that are cached for this commit are
 the ones listed in the raw.githubusercontent.com page I linked above. Since a new
 GHC version is using a new base and core packages, chances are that package versions
