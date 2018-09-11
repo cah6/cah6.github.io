@@ -2,7 +2,7 @@
 
 title: Christian Henry
 locale: en_US
-description: San Francisco, California
+description: Detroit, Michigan
 logo: amaro-picture.jpg
 search: true
 url:
@@ -40,7 +40,7 @@ owner:
   name: Christian Henry
   avatar: bio-photo.jpg
   email: christian.henry92@gmail.com
-  disqus-shortname: cah6-github-com
+  # disqus-shortname: cah6-github-com
   twitter: #username
   facebook: #username
   github: cah6

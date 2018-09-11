@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Learning Nix with Haskell: Project Basics"
+title: "Playing with Nix & Haskell: Project Basics"
 modified:
 categories: technology
 excerpt:
@@ -19,7 +19,7 @@ or forget why I found it difficult in the first place. This post will cover:
 - overriding haskell packages
 - getting documentation for your packages and enabling Hoogle 
 
-I will assume basic knowledge of Nix (i.e. that https://learnxinyminutes.com/docs/nix/ makes sense to you) 
+I will assume basic knowledge of Nix (i.e. that [this] (https://learnxinyminutes.com/docs/nix/) makes sense to you) 
 and some basic knowledge of the Haskell ecosystem (but not much). Knowing 
 information from project0 and project1 of https://github.com/Gabriel439/haskell-nix 
 is also probably useful. 
@@ -27,7 +27,7 @@ is also probably useful.
 # Setup
 We're going to use a cabal file that's pretty basic but has a few extra dependencies
 so we can see when things are getting downloaded / built from source:
-```
+```cabal
 name:                nix-test
 version:             0.1.0.0
 license:             BSD3
@@ -50,7 +50,7 @@ Remember to run cabal2nix any time you change your cabal file!
 
 # Pinning your haskell packages
 The absolute minimum derivation, which we'll be building on (call it `release.nix`), is as follows:
-```
+```nix
 let
   pkgs = import <nixpkgs> { };
 in
@@ -61,11 +61,11 @@ in
 The main thing I don't like about this is that it uses whatever <nixpkgs> is floating around
 your system. Instead, let's pin to a specific commit of a stable channel using
 nix-prefetch-git:
-```
+```bash
 $ nix-prefetch-git https://github.com/nixos/nixpkgs-channels.git refs/heads/nixos-18.03 > nixos-18-03.json
 ```
 which generates:
-```
+```json
 {
   "url": "https://github.com/nixos/nixpkgs-channels.git",
   "rev": "8b92a4e600458c01ab0a72f2492eb7120e18f9bc",
@@ -77,7 +77,7 @@ which generates:
 
 Then to use it in your nix file, you'd use a combination of readFile, fromJSON, 
 and fetchFromGitHub. In it's own file, this looks like:
-```
+```nix
 {
   bootstrap ? import <nixpkgs> {}
 , pinnedJsonFile
@@ -93,7 +93,7 @@ in
   import src {} 
 ```
 and is used in `release.nix` by changing it to:
-```
+```nix
 let
   pinnedPkgs = import ./pinnedPkgs.nix { pinnedJsonFile = ./nixos-18-03.json; };
 in
@@ -102,7 +102,9 @@ in
 ```
 
 If you want to see which haskell packages are pinned for that commit, you can
-go to https://raw.githubusercontent.com/NixOS/nixpkgs/8b92a4e600458c01ab0a72f2492eb7120e18f9bc/pkgs/development/haskell-modules/hackage-packages.nix (note the "rev" in there) and CTRL+f search for the name with quotes around it.
+go to `hackage-packages.nix` for that "rev". So for the JSON above, that file would be [this link] (https://raw.githubusercontent.com/NixOS/nixpkgs/8b92a4e600458c01ab0a72f2492eb7120e18f9bc/pkgs/development/haskell-modules/hackage-packages.nix).
+Then you can either CTRL+F there or download that file and search locally to see
+which version of a given dependency is pinned. 
 
 # Setting GHC version
 
@@ -112,7 +114,7 @@ My favorite way is via command line, which is easy since we extracted our pinnin
 to its own file. Since "haskellPackages" is an alias for "haskell.packages.<default-ghc-version>",
 we can do the following:
 
-```
+```bash
 > nix repl
 nix-repl> pkgs = import ./pinnedPkgs.nix { pinnedJsonFile = ./nixos-18-03.json; }
 nix-repl> pkgs.haskellPackages.ghc
@@ -122,7 +124,7 @@ nix-repl> pkgs.haskellPackages.ghc
 So, this nixpkgs is defaulting to ghc-8.2.2. What if we want to use a different GHC version?
 Well first, let's see which versions we have available, this time using the auto-complete of 
 nix repl:
-```
+```bash
 nix-repl> pkgs.haskell.packages.ghc<type tab>
 pkgs.haskell.packages.ghc7103        pkgs.haskell.packages.ghc822         pkgs.haskell.packages.ghcjs
 pkgs.haskell.packages.ghc7103Binary  pkgs.haskell.packages.ghc841         pkgs.haskell.packages.ghcjsHEAD
@@ -132,7 +134,7 @@ pkgs.haskell.packages.ghc821Binary   pkgs.haskell.packages.ghcHEAD
 
 If we want to use ghc843 instead, we would be tempted to replace "haskellPackages"
 with "haskell.packages.ghc843". Let's try that just to see what happens:
-```
+```bash
 $ nix-build release2.nix --dry-run
 these derivations will be built:
   /nix/store/l1yyi28qs37p64vr7s36rdz4fnv1gvcp-hscolour-1.24.2.drv
@@ -162,7 +164,7 @@ In my opinion, a better way is to pick a Nix channel that has whatever GHC you
 want as the default, since it will come with a set of packages that will work
 well together and not require that you build so much yourself. In this case, nixos-18.09
 has GHC 8.4.3 as the default, so we could use it instead by running:
-```
+```bash
 $ nix-prefetch-git https://github.com/nixos/nixpkgs-channels.git refs/heads/nixos-18.09 > nixos-18-09.json
 ```
 and pointing to this new `nixos-18-09.json` in your `release.nix`.
@@ -171,7 +173,7 @@ and pointing to this new `nixos-18-09.json` in your `release.nix`.
 
 There are a few ways to override haskell packages but most are, surprisingly,
 not very composable. For instance, if you were to try:
-```
+```nix
 let
   pkgs = import <nixpkgs> { };
   overriddenPackages1 = pkgs.haskellPackages.override {
@@ -196,7 +198,7 @@ line, since the second override cleared out what the first one set.
 The best way I've found is with the (slightly arcane) syntax described in  
 (this ticket) https://github.com/NixOS/nixpkgs/issues/26561. Applying this, your
 `release.nix` becomes:
-```
+```nix
 let
   pinnedPkgs = import ./pinnedPkgs.nix { pinnedJsonFile = ./nixos-18-09.json; };
 
@@ -223,7 +225,7 @@ If you're working on Haskell locally, you really should be using a local Hoogle
 instance so that the documentation you're viewing matches the version you're using.
 Fortunately Nix makes this quite easy, especially once you set up your overrides
 as above. A standalone expression for this looks like:
-```
+```nix
 {
   # Library of functions to use, for composeExtensions. 
   lib ? (import <nixpkgs> {}).pkgs.lib
@@ -244,7 +246,7 @@ if withHoogle
 ```
 Then we can change our `release.nix` to call it with what we have so far, taking
 an input to toggle this functionality:
-```
+```nix
 { withHoogle ? false
 }:
 let
@@ -273,16 +275,14 @@ in
 ```
 And if we wanted to run Hoogle with these packages, it would just be a matter of
 running the start command in this shell:
-```
+```bash
 nix-shell --run 'hoogle server --port=8080 --local --haskell'
 ```
 
 # Ending Notes
 
-
+That's all for this post. If you want to see the final setup as this post left
+off, check out [this repository] (). 
 
 If you'd like to comment on information in this post, please do so in the associated 
-reddit post here!
-
-Still todo:
-- put code language for snippet highlighting
+reddit post here! 
