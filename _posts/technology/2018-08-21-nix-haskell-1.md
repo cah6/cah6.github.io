@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Haskell & Nix: Project Basics"
+title: "Learning Nix with Haskell: Project Basics"
 modified:
 categories: technology
 excerpt:
@@ -8,14 +8,19 @@ tags: []
 image:
   feature:
 date: 2018-08-08T00:00:00-00:00
-# modified: 2016-06-01T14:19:19-04:00
+modified: 2018-09-10T21:45:35
 ---
 
 I've been working a lot with Haskell and Nix lately, and I thought now would be
 a good time to pause and write about it before I either forget what I've learned
-or forget why I found it difficult in the first place. 
+or forget why I found it difficult in the first place. This post will cover:
+- pinning haskellPackages for your project 
+- setting the GHC version you want
+- overriding haskell packages
+- getting documentation for your packages and enabling Hoogle 
 
-This tutorial will assume basic knowledge of Nix (i.e. that https://learnxinyminutes.com/docs/nix/ makes sense to you) and some basic knowledge of the Haskell ecosystem (but not much). Knowing 
+I will assume basic knowledge of Nix (i.e. that https://learnxinyminutes.com/docs/nix/ makes sense to you) 
+and some basic knowledge of the Haskell ecosystem (but not much). Knowing 
 information from project0 and project1 of https://github.com/Gabriel439/haskell-nix 
 is also probably useful. 
 
@@ -259,10 +264,25 @@ in
   }
 ```
 Then, if we wanted to enter a shell where we had GHC packages built with documentation, 
-we could write a `shell.nix` file like:
-```
+we could write a `shell.nix` with:
+```nix
 let 
   projectDrv = (import ./release.nix { withHoogle = true; } ).project1;
 in 
   projectDrv.env
 ```
+And if we wanted to run Hoogle with these packages, it would just be a matter of
+running the start command in this shell:
+```
+nix-shell --run 'hoogle server --port=8080 --local --haskell'
+```
+
+# Ending Notes
+
+
+
+If you'd like to comment on information in this post, please do so in the associated 
+reddit post here!
+
+Still todo:
+- put code language for snippet highlighting
