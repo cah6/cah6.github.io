@@ -324,4 +324,4 @@ off, check out [this repository](https://github.com/cah6/haskell-nix-skeleton-1)
 I'll show how this basic project setup can be hooked up to an IDE.
 
 If you'd like to comment on any part of this post, please do so in the associated 
-reddit post [here]()! As my first formal blog post, any type of feedback is welcome!
+reddit post [here](https://www.reddit.com/r/haskell/comments/9f3vrm/exploring_nix_haskell_part_1_project_setup/)! As my first formal blog post, any type of feedback is welcome!
