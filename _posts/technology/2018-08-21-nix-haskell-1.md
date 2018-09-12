@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Understanding Nix & Haskell: Project Setup"
+title: "Nix & Haskell Part 1: Project Setup"
 modified:
 categories: technology
 excerpt:
@@ -13,21 +13,51 @@ modified: 2018-09-10T21:45:35
 
 I've been working a lot with Haskell and Nix lately, and I thought now would be
 a good time to pause and write about it before I either forget what I've learned
-or forget why I found it difficult in the first place. This post will cover:
+or forget why I found it difficult in the first place. 
+
+This is the first of a series of posts, with the overarching goal of building up a 
+deterministic Haskell development environment using Nix, including a modern IDE experience and any tooling
+built-in. I've seen a lot of Haskell posts recently (rightly-so) expressing frustration
+at the initial developer experience, and hopefully this can contribute to alleviating that.
+This means that while we'll end each post with a valid, working environment, along
+the way I'll try to also explain the individual pieces as much as I understand them, so we can build up
+more of an intuition of what each piece does.
+
+This first post will cover:
+- why choose Nix for your Haskell environment
 - pinning haskellPackages for your project 
 - setting the GHC version you want
 - overriding haskell packages
 - getting documentation for your packages and enabling Hoogle 
 
 I will assume basic knowledge of Nix (i.e. [this](https://learnxinyminutes.com/docs/nix/) makes sense to you)
-and some basic knowledge of the Haskell ecosystem (but not much). Knowing 
-information from project0 and project1 of <https://github.com/Gabriel439/haskell-nix> 
+and some basic knowledge of the Haskell ecosystem (but not much). Having read project0 and project1 of <https://github.com/Gabriel439/haskell-nix> 
 is also probably useful. I will try to provide full in-line examples wherever possible 
-so you can follow along; if you get stuck, the end code, with intermediate steps, can 
+so you can follow along; if you get stuck, the end code for this post, with intermediate steps, can 
 be found [here](https://github.com/cah6/haskell-nix-skeleton-1).
 
+## Why Nix
+First of all, why use Nix for your development environment at all, instead of Stack, the main alternative? 
+To be clear, I think Stack is quite good at getting a development environment up
+quickly and easily -- if you'd like to read more about it, the [stack guide](https://docs.haskellstack.org/en/stable/GUIDE/) 
+is pretty good, and the first few sections of [this post](https://lexi-lambda.github.io/blog/2018/02/10/an-opinionated-guide-to-haskell-in-2018/)
+are awesome for understanding how to get it working with your IDE and explaining some of
+the gotchas. 
+
+With that aside, there are a few reasons for choosing Nix-based development:
+1. Nix makes managing non-Haskell dependencies pretty easy
+2. With Nix, you can make your entire developer environment completely reproducible, 
+in the style of a lightweight [vagrant](https://www.vagrantup.com/intro/index.html). Think: 
+all command line tools declaratively defined, IDE with all the right plugins, etc.
+3. Most GHCJS frameworks don't play too well with Stack. I've been playing around
+with [reflex](https://github.com/reflex-frp/reflex-platform) and [obelisk](https://github.com/obsidiansystems/obelisk) 
+recently, and while you could probably get things working eventually
+with Stack, it's not the primary, supported method. 
+4. Nix is more powerful. It's a full language and, while I think it's more complicated,
+it does have a *MUCH* higher upper bound for what you can do with it.
+
 ## Setup
-We're going to use a cabal file that's pretty basic but has a few extra dependencies
+Enough why, let's get started! We're going to use a cabal file that's pretty basic but has a few extra dependencies
 so we can see when things are getting downloaded / built from source:
 ```
 name:                nix-test
@@ -66,6 +96,7 @@ The main thing I don't like about this is that it uses whatever "nixpkgs" is flo
 your system. Instead, let's pin to a specific commit of a stable channel using
 nix-prefetch-git:
 ```bash
+$ nix-env -i nix-prefetch-git # if you don't have it
 $ nix-prefetch-git https://github.com/nixos/nixpkgs-channels.git refs/heads/nixos-18.03 > nixos-18-03.json
 ```
 which generates:
@@ -289,9 +320,8 @@ $ nix-shell --run 'hoogle server --port=8080 --local --haskell'
 ## Ending Notes
 
 That's all for this post, thanks for reading along this far! Again, if you want to see the final setup as this post left
-off, check out [this repository](https://github.com/cah6/haskell-nix-skeleton-1). Chances are I will expand on this setup in future
-posts, with the end goal being a completely deterministic development environment 
-with a great IDE experience and any tooling you would need. 
+off, check out [this repository](https://github.com/cah6/haskell-nix-skeleton-1). In then next post,
+I'll show how this basic project setup can be hooked up to an IDE.
 
 If you'd like to comment on any part of this post, please do so in the associated 
-reddit post [here]()! 
+reddit post [here]()! As my first formal blog post, any type of feedback is welcome!
