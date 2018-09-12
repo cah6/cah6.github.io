@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Nix & Haskell Part 1: Project Setup"
+title: "Exploring Nix & Haskell Part 1: Project Setup"
 modified:
 categories: technology
 excerpt:
@@ -11,14 +11,14 @@ date: 2018-08-08T00:00:00-00:00
 modified: 2018-09-10T21:45:35
 ---
 
-I've been working a lot with Haskell and Nix lately, and I thought now would be
+I've been working a lot with Nix and Haskell lately, and I thought now would be
 a good time to pause and write about it before I either forget what I've learned
 or forget why I found it difficult in the first place. 
 
 This is the first of a series of posts, with the overarching goal of building up a 
 deterministic Haskell development environment using Nix, including a modern IDE experience and any tooling
-built-in. I've seen a lot of Haskell posts recently (rightly-so) expressing frustration
-at the initial developer experience, and hopefully this can contribute to alleviating that.
+built-in. I've seen a lot of Haskell posts recently expressing frustration
+at the initial developer experience, and hopefully this can help alleviate that.
 This means that while we'll end each post with a valid, working environment, along
 the way I'll try to also explain the individual pieces as much as I understand them, so we can build up
 more of an intuition of what each piece does.
@@ -37,9 +37,9 @@ so you can follow along; if you get stuck, the end code for this post, with inte
 be found [here](https://github.com/cah6/haskell-nix-skeleton-1).
 
 ## Why Nix
-First of all, why use Nix for your development environment at all, instead of Stack, the main alternative? 
+First of all, why use Nix for your development environment at all instead of Stack, the main alternative? 
 To be clear, I think Stack is quite good at getting a development environment up
-quickly and easily -- if you'd like to read more about it, the [stack guide](https://docs.haskellstack.org/en/stable/GUIDE/) 
+quickly and painlessly -- if you'd like to read more about it, the [stack guide](https://docs.haskellstack.org/en/stable/GUIDE/) 
 is pretty good, and the first few sections of [this post](https://lexi-lambda.github.io/blog/2018/02/10/an-opinionated-guide-to-haskell-in-2018/)
 are awesome for understanding how to get it working with your IDE and explaining some of
 the gotchas. 
@@ -320,7 +320,7 @@ $ nix-shell --run 'hoogle server --port=8080 --local --haskell'
 ## Ending Notes
 
 That's all for this post, thanks for reading along this far! Again, if you want to see the final setup as this post left
-off, check out [this repository](https://github.com/cah6/haskell-nix-skeleton-1). In then next post,
+off, check out [this repository](https://github.com/cah6/haskell-nix-skeleton-1). In the next post,
 I'll show how this basic project setup can be hooked up to an IDE.
 
 If you'd like to comment on any part of this post, please do so in the associated 
