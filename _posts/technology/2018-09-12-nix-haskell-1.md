@@ -24,11 +24,11 @@ the way I'll try to also explain the individual pieces as much as I understand t
 more of an intuition of what each piece does.
 
 This first post will cover:
-- why choose Nix for your Haskell environment
-- pinning haskellPackages for your project 
-- setting the GHC version you want
-- overriding haskell packages
-- getting documentation for your packages and enabling Hoogle 
+* why choose Nix for your Haskell environment
+* pinning haskellPackages for your project 
+* setting the GHC version you want
+* overriding haskell packages
+* getting documentation for your packages and enabling Hoogle 
 
 I will assume basic knowledge of Nix (i.e. [this](https://learnxinyminutes.com/docs/nix/) makes sense to you)
 and some basic knowledge of the Haskell ecosystem (but not much). Having read project0 and project1 of <https://github.com/Gabriel439/haskell-nix> 
