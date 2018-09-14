@@ -6,7 +6,7 @@ categories: technology
 excerpt:
 tags: []
 image:
-  feature:
+  feature: nix-haskell-banner.png
 date: 2018-08-08T00:00:00-00:00
 modified: 2018-09-10T21:45:35
 ---
