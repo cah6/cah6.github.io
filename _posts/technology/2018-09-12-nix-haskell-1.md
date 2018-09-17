@@ -147,12 +147,12 @@ But which version of GHC are we using? One way would be to search for `"base"` (
 backtrack to the version of GHC from that 
 (GHC [release notes](https://downloads.haskell.org/~ghc/master/users-guide/8.6.1-notes.html#included-libraries) show included library versions).
 
-Instead, my favorite way is via `nix repl`, made easier by the fact that we extracted our pinning function
+Instead, my favorite way is via `nix-repl`, made easier by the fact that we extracted our pinning function
 to its own file. Since `haskellPackages` is an alias for `haskell.packages.<default-ghc-version>`,
 we can do the following:
 
 ```bash
-$ nix repl
+$ nix-repl
 nix-repl> pkgs = import ./pkgs-from-json.nix { json = ./nixos-18-03.json; }
 nix-repl> pkgs.haskellPackages.ghc
 «derivation /nix/store/djy5y2x23cpzksxpwc1zb3df9kq4y3lw-ghc-8.2.2.drv»
@@ -160,7 +160,7 @@ nix-repl> pkgs.haskellPackages.ghc
 
 So, this nixpkgs is defaulting to ghc-8.2.2. What if we want to use a different GHC version?
 First let's see which versions we have available, this time using the auto-complete of 
-`nix repl`:
+`nix-repl`:
 ```bash
 nix-repl> pkgs.haskell.packages.ghc<type tab tab>
 pkgs.haskell.packages.ghc7103        pkgs.haskell.packages.ghc822         pkgs.haskell.packages.ghcjs
