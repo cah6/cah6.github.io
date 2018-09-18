@@ -78,9 +78,17 @@ executable nix-test
   default-language:    Haskell2010
 ```
 Then you'll want to do a `cabal2nix . > default.nix` to generate a derivation from that. 
-Remember to run cabal2nix any time you change your cabal file!
+Remember to run cabal2nix any time you change your cabal file! Note that by default, Nix will require a LICENSE file for your project.
 
-Note that by default, Nix will require a LICENSE file for your project.
+Also, make sure your Nix version is at least 2.0. You can check with `nix --version`, and
+according to their manual you can update to latest version with:
+```
+nix-channel --update; nix-env -iA nixpkgs.nix
+```
+This is important because some command line tools have changed between versions. 
+As an example we'll be using, the command to enter the repl changed from `nix-repl` to `nix repl`, 
+and some commands won't work if you launch it with `nix-repl`, since it explicitly depends on
+and launches using Nix 1.
 
 ## Pinning your haskell packages
 The absolute minimum derivation, which we'll be building on (call it `release.nix`), is as follows:
