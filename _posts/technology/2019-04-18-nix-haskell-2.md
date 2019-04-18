@@ -197,4 +197,4 @@ Reflex project using Nix. That will hopefully come out faster than this one did 
 changed much, but the code associated with this can be found [here](https://github.com/cah6/haskell-nix-skeleton-1).
 
 If you’d like to comment on any part of this post, please do so in the associated 
-reddit post [here]()! Feel free to also message me directly.
+reddit post [here](https://www.reddit.com/r/haskell/comments/beq792/exploring_nix_haskell_part_2_dev_tools_ide/)! Feel free to also message me directly.
