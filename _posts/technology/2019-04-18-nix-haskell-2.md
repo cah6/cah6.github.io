@@ -7,16 +7,16 @@ excerpt:
 tags: []
 image:
   feature: nix-haskell-banner.png
-date: 2018-10-01T00:00:00-00:00
-modified: 2018-10-01T21:45:35
-published: false
+date: 2019-04-18T00:00:00
+modified: 2019-04-18T00:00:00
+published: true
 ---
 
-In the [previous post](https://cah6.github.io/technology/nix-haskell-1/), I left off with a simple `shell.nix` file that you could
-use to run a local hoogle server. 
+In the [previous post from a loong time ago](https://cah6.github.io/technology/nix-haskell-1/), 
+I left off with a simple `shell.nix` file that you could use to run a local hoogle server. 
 
 In this post, I'll build on that to show how you can add dependencies to your 
-dev environment, then use that to bring up a no-fuss Haskell environment with a great IDE
+dev environment, then use that to bring up a no-fuss Haskell environment with a solid IDE
 experience.
 
 ## Adding Dev Tools
@@ -26,9 +26,9 @@ This contained ghc/ghci, but not much else. To add more, we'll need to "override
 attributes" in this env. Notably, you'll probably want to edit `buildInputs`
 (which will load programs into our `nix-shell`) and `shellHook` (which will run
 whatever code block we provide when the shell is entered). You should *definitely*
-install cabal this way (even if you have a globally installed caba), so that your GHC and
+install cabal this way (even if you have a globally installed cabal), so that your GHC and
 cabal versions play nicely together. Note that your `releaseX.nix` file only exposes
-your project, so you'll need to re-import your pinned nixpkgs to get the other
+your project, so you'll need to re-import your pinned nixpkgs in this shell file to get the other
 haskell packages you want. In practice, putting this all together with a few more
 dev tools looks `shell2.nix`:
 ```
@@ -97,27 +97,26 @@ I've tried:
 - Haskell IDE Engine (HIE) with [Atom, Sublime, Visual Studio Code, Emacs, etc]
 - ghc-simple for Visual Studio Code
 
+I also want to quickly mention intellij-haskell. Coming from a java job, I'm used to
+intellij and find that this plugin provides the best overall dev experience. However,
+it's tied to stack projects and isn't suitable, as far as I can tell, for projects built with Nix. If your
+project is using stack, check it out too! 
+
 Here's my experience with each:
 
 Dante is pretty good, but ultimately I couldn't be bothered to learn emacs along
 with everything else. If you're already comfortable there, try it out!
 
-HIE consistently looks promising but consistently lets me down. While it has wide adoption
-and looks to be the converging point for a lot of other tools, I've had issues getting
-it fully working. I actually had plans for
-this post to be a lot longer and essentially be a tutorial on how to use HIE with 
-this type of project setup. I got through cache issues, installing the version
+HIE consistently looks promising but can be a frustrating end user experience. While it has wide adoption
+and looks to be the converging point for a lot of other tools, I've had lots of issues getting
+it fully working. I would get through cache issues, installing the version
 corresponding to my GHC version, linking that to my project, whatever other errors
-sprang up -- and then hit a 
-[brick wall](https://github.com/NixOS/nixpkgs/pull/46453). From what I can tell,
-the issue is that the haskell packages that HIE is trying to use don't match the packages
-my Nix environment has loaded. It could be that there's a work-around for this, 
-or that once that issue is fixed there will be no more road-bumps (doubtful) but 
-that doesn't matter to me right now because...
+sprang up, and it might work in some way for some time but would eventually hit something else. Note that this evaluation was around 6 months ago; it could be better now but it doesn't really matter to me because...
 
-In my desperation I tried out [vscode-ghc-simple](https://github.com/dramforever/vscode-ghc-simple)
+I decided to try out [vscode-ghc-simple](https://github.com/dramforever/vscode-ghc-simple)
 and love it. It "just works" in a way that lets you focus on actually writing
-haskell code, and works with any project that has GHC 8.0+.
+haskell code, and works with any project that has GHC 8.0+. There is almost zero
+project setup and it works with most environment setups. 
 
 ## Setting up ghc-simple
 
@@ -134,7 +133,18 @@ $ nix-shell shell.nix
 $ code .
 ```
 to launch vscode with your project's GHC loaded up. Go to some Haskell files, edit
-them, you should see compile errors. That's it.
+them, you should see compile errors. That's about it!
+
+If for some reason you don't see compile errors or the plugin doesn't seem to be
+working, it can be helpful to check the plugin logs. The default location for these
+are:
+* NixOS: ~/.config/Code/logs
+* Mac: ~/Library/Application\ Support/Code/
+
+and you can find the most recent logs by digging into this general area:
+```
+logs/{last folder (ordered by date)}/extHost#/output_logging_XXX/#-GHC.log
+```
 
 ## My workflow
 
@@ -150,14 +160,14 @@ project1 = self.callPackage ./default.nix { };
 ```
 with
 ```
-project1 = self.callCabal2nix ./default.nix { };
+project1 = self.callCabal2nix "project1" ./project1.cabal { };
 ```
 
 With this change, my process for adding a new dependency is:
 1. List it in your cabal file.
 2. `exit` your `nix-shell`. 
 3. Reload it with `nix-shell shell.nix`. This will need to re-build your Hoogle database, 
-  which takes around 2-3 minutes.
+  which takes around 2-3 minutes. Note that [lorri](https://github.com/target/lorri) looks to be a good tool for automatically doing this in the background for you, though I haven't tested it out yet.  
 4. Restart Hoogle with your new shell.
 5. Exit vscode and relaunch with `code .` in your new shell. It should take ~5-10 seconds
   for errors and such to show up in the editor as it connects to ghci. 
@@ -178,9 +188,9 @@ Some assorted things I've found while using this workflow:
 
 ## Ending Notes
 
-That's about it for this post -- my next one will probably show how to set up a
-project with multiple directories and possibly multiple GHC versions. It hasn't
+That's it for this post -- my next one will show how to set up a
+Reflex project using Nix. That will hopefully come out faster than this one did (sorry)! It hasn't
 changed much, but the code associated with this can be found [here](https://github.com/cah6/haskell-nix-skeleton-1).
 
 If you’d like to comment on any part of this post, please do so in the associated 
-reddit post [here]()!
+reddit post [here]()! Feel free to also message me directly.
