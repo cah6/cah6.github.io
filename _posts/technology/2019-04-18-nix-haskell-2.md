@@ -17,7 +17,9 @@ I left off with a simple `shell.nix` file that you could use to run a local hoog
 
 In this post, I'll build on that to show how you can add dependencies to your 
 dev environment, then use that to bring up a no-fuss Haskell environment with a solid IDE
-experience.
+experience. Be warned that the IDE section is fairly opinionated -- if you have one
+that works for you, great! However, I think a lot of people don't know where to start,
+and hopefully this will help in establishing a starting point.
 
 ## Adding Dev Tools
 
@@ -97,10 +99,12 @@ I've tried:
 - Haskell IDE Engine (HIE) with [Atom, Sublime, Visual Studio Code, Emacs, etc]
 - ghc-simple for Visual Studio Code
 
-I also want to quickly mention intellij-haskell. Coming from a java job, I'm used to
-intellij and find that this plugin provides the best overall dev experience. However,
-it's tied to stack projects and isn't suitable, as far as I can tell, for projects built with Nix. If your
-project is using stack, check it out too! 
+I also want to quickly mention intellij-haskell. Coming from Java, I'm used to
+intellij and find that this plugin provides an excellent overall dev experience. However,
+it's tied to Stack projects and isn't suitable, as far as I can tell, for projects built with Nix. If your
+project is using Stack, check it out too! For what it's worth, my main reason
+for using Nix over Stack was to be able to work on projects using [Reflex](https://reflex-frp.org/),
+which is more supported through the Nix ecosystem. 
 
 Here's my experience with each:
 
