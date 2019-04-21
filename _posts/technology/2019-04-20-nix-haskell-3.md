@@ -14,7 +14,7 @@ published: true
 
 In the last post, we ended off with a Nix-based environment with some basic workflow commands to build and test your Haskell code. I mentioned that my reason for investigating Nix environments in the first place was because it's the most supported way to build a frontend Haskell application with [Reflex](https://reflex-frp.org/) / [GHCJS](https://github.com/ghcjs/ghcjs).
 
-In this post we'll start with a project based off [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) and remove/add bits and pieces to it until we have a deployable (frontend only, for now) application with a prescribed IDE experience and workflow.
+In this post we'll start with a project based off [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) and remove/add bits and pieces to it until we have a deployable (frontend only, for now) application with a prescribed IDE experience and workflow. It shouldn't be strictly necessary to read the previous posts before this one, but it could help to put things in context. 
 
 To that end, this post will go over:
 - other projects that have similar end goals
