@@ -120,7 +120,8 @@ reflex-platform.project ({ pkgs, ... }: {
 ### Wiring in Warp
 
 Warp is what will provide us with a hot-reloading browser window *running GHC* when we save the source code. This will be very useful in our workflow, so let's enable that by default. To do that:
-1. Add jsaddle-warp as a dependency of `frontend.cabal`:
+- Add jsaddle-warp as a dependency of `frontend.cabal`:
+
 ```yaml
 ...
 executable frontend
@@ -132,8 +133,9 @@ executable frontend
   ...
 ...
 ```
-2. Change our `Main.hs` to be started with Jsaddle.Warp instead:
-```
+- Change our `Main.hs` to be started with Jsaddle.Warp instead:
+
+```haskell
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
@@ -144,7 +146,8 @@ import Language.Javascript.JSaddle.Warp
 main :: IO ()
 main = run 3003 $ mainWidget $ text "Hello!"
 ```
-3. Set `useWarp = true;` in `default.nix`:
+- Set `useWarp = true;` in `default.nix`:
+
 ```nix
 ...
 reflex-platform.project ({ pkgs, ... }: {
@@ -183,7 +186,7 @@ frontend-result
 
 ### Setting up Visual Studio Code
 
-Finally, at this point this guide is pretty committed to using Visual Studio Code so we'll make a settings override that will work with our project structure. The default settings set you up pretty well, but we'll also use `:set -i` (a ghci command) to include the `frontend/src` and `common/src` folders. The plugin is usually pretty good about figuring out your project type but I have had it incorrectly default to Stack, so we'll specify that directly. Note that, for now, this is non-new-style cabal. All together your `.vscode/settings.json` file should look like:
+At this point, this guide is pretty committed to using Visual Studio Code so we'll make a settings override that will work with our project structure. The default settings set you up pretty well, but we'll also use `:set -i` (a ghci command) to include the `frontend/src` and `common/src` folders. The plugin is usually pretty good about figuring out your project type but I have had it incorrectly default to Stack, so we'll specify that directly. Note that, for now, this is non-new-style cabal. All together your `.vscode/settings.json` file should look like:
 ```json
 {
   "ghcSimple.startupCommands.custom": [
@@ -195,7 +198,7 @@ Finally, at this point this guide is pretty committed to using Visual Studio Cod
 }
 ```
 
-*Now* we have a skeleton that will work with everything in the next section. To see the code tagged now, see https://github.com/cah6/haskell-nix-skeleton-2/tree/barebones_webapp. 
+*Now* we have a skeleton that will work with everything in the next section. To see the code tagged now, see [here](https://github.com/cah6/haskell-nix-skeleton-2/tree/barebones_webapp). 
 
 ## Workflow commands
 
@@ -240,7 +243,7 @@ Since this is something you want to fire once and keep running, you probably wan
 ```bash
 nix-shell -A shells.ghc --run 'ghcid -W -c "cabal new-repl frontend" -T Main.main'
 ```
-And then you can go to `localhost:4000` (or whatever port you have set in your entry point) to see your application.
+And then you can go to `localhost:3003` (or whatever port you have set in your entry point) to see your application.
 
 
 ### Fire up a repl
@@ -279,6 +282,8 @@ Before pushing, you may want to test out the final ghcjs app by opening it in yo
 open docs/index.html
 ```
 
+I know this method isn't for everybody, but if you have strong counter-opinions to doing this you probably have enough knowledge or desire to host the docs folder elsewhere.
+
 ### All together now
 
 All this means that I usually have a number of terminals (in my case iTerm split windows) open:
@@ -291,11 +296,11 @@ Organizing them in the foreground like this means that it's easier to restart al
 
 ## Making some changes
 
-Now that we have these core commands out of the way, let's make some changes to the project to illustrate common types of environment changes you'll need to make. This is pretty similar to the info in https://github.com/Gabriel439/haskell-nix, but this can be really confusing for newcomers, so I think it's worth re-showing.
+Now that we have these core commands out of the way, let's make some changes to the project to illustrate common types of environment changes you'll need to make. This is pretty similar to the info in [https://github.com/Gabriel439/haskell-nix](https://github.com/Gabriel439/haskell-nix), but this can be really confusing for newcomers, so I think it's worth re-showing.
 
 ### dontCheck to skip tests
 
-Let's say our frontend needed the package [http-media](http://hackage.haskell.org/package/http-media). Re-entering our `nix-shell -A shells.ghc` works quickly but re-entering `nix-shell -A shells.ghcjs` makes it build and test the package from scratch, since it's not in the cached set of packages for reflex-platform.
+Let's say our frontend needed the package [http-media](http://hackage.haskell.org/package/http-media). First, add that package to the `frontend.cabal` file. Re-entering our `nix-shell -A shells.ghc` works quickly but re-entering `nix-shell -A shells.ghcjs` makes it build and test the package from scratch, since it's not in the cached set of packages for reflex-platform.
 
 If we don't care about running the tests for this package, whether because it takes too long, can't compile, or can't pass with the package combination we have, we can override it with the `dontCheck` function in our `default.nix`:
 ```nix
@@ -318,11 +323,11 @@ exceptions ==0.8.*,
 http-media ==0.6.*,
 servant >=0.8 && <0.13
 ```
-because this package uses strict bounds on dependencies and the version it decided to use (v0.3.3) doesn't mesh with what we have. The latest commit (v0.3.4) does though, so we can grab the full info:
+because this package uses strict bounds on dependencies and the version it decided to use (v0.3.3) doesn't mesh with what we have. The latest commit (v0.3.4) does though, and this library has a Nix derivation in the repository, so we can grab the full info with:
 ```bash
 nix-prefetch-git https://github.com/imalsogreg/servant-reflex 4459563
 ```
-and put the info into a `nix/servant-reflex.nix` file. Note that `callPackage` expects the `fetchFromGitHub` return value, without the `import` like before:
+and put the rev/sha256 into a `nix/servant-reflex.nix` file. Note that `callPackage` expects the `fetchFromGitHub` return value, without the `import` like before:
 ```nix
 { bootstrap ? import <nixpkgs> {} }:
 bootstrap.fetchFromGitHub {
@@ -332,7 +337,7 @@ bootstrap.fetchFromGitHub {
   sha256 = "009d8vr6mxfm9czywhb8haq8pwvnl9ha2cdmaagk1hp6q4yhfq1n";
 }
 ```
-and use in our `default.nix`:
+Then put it in your `default.nix` overrides:
 ```nix
 ...
   overrides = self: super: {
@@ -344,17 +349,17 @@ and use in our `default.nix`:
 
 ### Pinning through cabal
 
-If you need library xyz (you put it in your cabal file and entering the shell fails) and it doesn't have a Nix file, you can also pin it by running `cabal2nix` directly on the GitHub repository and saving that in a file like:
+If you need library xyz (you put it in your cabal file and entering the shell fails) and it doesn't have a Nix file, you can also pin it by running `cabal2nix` directly on the GitHub repository. 
+For example, to pin the lastest commit:
 ```
 cabal2nix https://github.com/owner/xyz > nix/xyz.nix
 ```
-for the lastest or 
+or for a specific commit:
 ```
 cabal2nix https://github.com/owner/xyz --revision abcd1234 > nix/xyz.nix
 ```
-for a specific commit. 
 
-Then just override that in your `default.nix`:
+Then edit your overrides:
 ```
 ...
   overrides = self: super: {
@@ -365,4 +370,16 @@ Then just override that in your `default.nix`:
 ```
 
 ## Ending Notes
+
+If you want to play around with the barebones skeleton in your own repository, just do something similar to the initial skeleton clone:
+```bash
+git clone https://github.com/cah6/haskell-nix-skeleton-2/tree/barebones_webapp my-haskell-widgets
+cd my-haskell-reflex-project
+rm -rf .git
+git init
+git add .
+git commit -m "Initial commit after cloning skeleton"
+```
+
+Hopefully this post will help you get started in making widgets and Haskell and providing an easy way to show them off to your friends. Friend send friends widgets made in Haskell, right?
 
