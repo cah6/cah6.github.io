@@ -294,7 +294,7 @@ All this means that I usually have a number of terminals (in my case iTerm split
 
 Organizing them in the foreground like this means that it's easier to restart all 4 when you change a package in your cabal file / Nix expression.
 
-## Making some changes
+## Adding some dependencies
 
 Now that we have these core commands out of the way, let's make some changes to the project to illustrate common types of environment changes you'll need to make. This is pretty similar to the info in [https://github.com/Gabriel439/haskell-nix](https://github.com/Gabriel439/haskell-nix), but this can be really confusing for newcomers, so I think it's worth re-showing.
 
