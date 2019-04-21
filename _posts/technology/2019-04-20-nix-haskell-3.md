@@ -14,7 +14,14 @@ published: true
 
 In the last post, we ended off with a Nix-based environment with some basic workflow commands to build and test your Haskell code. I mentioned that my reason for investigating Nix environments in the first place was because it's the most supported way to build a frontend Haskell application with [Reflex](https://reflex-frp.org/) / [GHCJS](https://github.com/ghcjs/ghcjs).
 
-With that being said, with this post we'll start with a project based off [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) and remove/add bits and pieces to it until we have a deployable (frontend only, for now) application with a prescribed IDE experience and workflow.
+In this post we'll start with a project based off [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) and remove/add bits and pieces to it until we have a deployable (frontend only, for now) application with a prescribed IDE experience and workflow.
+
+To that end, this post will go over:
+- other projects that have similar end goals
+- editing [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) to make it more streamlined for the frontend portion of a webapp
+- adding some workflow pieces, like hot reloading and IDE config
+- command line operations you'll use often when developing on this type of project
+- common issues you'll run into when adding more dependencies
 
 ##  A quick disclaimer on alternatives...
 
@@ -381,5 +388,4 @@ git add .
 git commit -m "Initial commit after cloning skeleton"
 ```
 
-Hopefully this post will help you get started in making widgets and Haskell and providing an easy way to show them off to your friends. Friend send friends widgets made in Haskell, right?
-
+Hopefully this post has helped you get started in making widgets in Haskell and providing an easy way to show them off to your friends. Friend send friends widgets made in Haskell, right?
