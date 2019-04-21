@@ -390,4 +390,8 @@ git add .
 git commit -m "Initial commit after cloning skeleton"
 ```
 
-Hopefully this post has helped you get started in making widgets in Haskell and providing an easy way to show them off to your friends. Friend send friends widgets made in Haskell, right?
+Hopefully this post has helped you get started in making widgets in Haskell and providing an easy way to show them off to your friends. Friend send friends widgets made in Haskell, right? 
+
+If you want to learn more Reflex now that you have a good test environment, I would recommend [the qfpl tutorial](https://blog.qfpl.io/posts/reflex/basics/introduction/) for concepts, [reflex-dom-inbits](https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md) for helpful bits of knowledge, and [the quickref](https://github.com/reflex-frp/reflex/blob/develop/Quickref.md) for a function cheat sheet.
+
+As always, if you'd like to comment on this post please do so in the associated reddit post [here]().
