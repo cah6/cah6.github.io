@@ -14,7 +14,7 @@ published: true
 
 In the last post, we ended off with a Nix-based environment with some basic workflow commands to build and test your Haskell code. I mentioned that my reason for investigating Nix environments in the first place was because it's the most supported way to build a frontend Haskell application with [Reflex](https://reflex-frp.org/) / [GHCJS](https://github.com/ghcjs/ghcjs).
 
-With that being said, with this post we'll start with a project based off [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) and remove/add bits and pieces to it until we have a deployable (frontend only, for now) application with a prescribed workflow and IDE experience.
+With that being said, with this post we'll start with a project based off [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) and remove/add bits and pieces to it until we have a deployable (frontend only, for now) application with a prescribed IDE experience and workflow.
 
 ##  A quick disclaimer on alternatives...
 
@@ -31,7 +31,7 @@ That being said, a lot of these things have been fixed over the last few months,
 
 ## Setting up the basic skeleton
 
-The goal for this section is to get the skeleton to a spot where we can comfortably learn the workflow commands and make future changes. We'll start with the reflex-project-skeleton, wiping history and re-committing:
+The goal for this section is to get the skeleton to a spot where we can comfortably learn the workflow commands and make future changes. We'll start with the [reflex-project-skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton), wiping history and re-committing:
 ```bash
 git clone --recurse-submodules https://github.com/ElvishJerricco/reflex-project-skeleton my-haskell-reflex-project
 cd my-haskell-reflex-project
@@ -41,10 +41,10 @@ git add .
 git commit -m "Initial commit after cloning skeleton"
 ```
 
-You probably want to run `./reflex-platform/try-reflex` to set up and populate your caches. Some parts of this can take a while; if you've never tried reflex before, the `try-reflex` process is:
+You probably want to run `./reflex-platform/try-reflex` to set up and populate your caches. Some parts of this can take a while; if you've never tried reflex before, the `try-reflex` script will:
 1. Download / install Nix (fairly quick, it's around 22MB)
 2. Ask you to manually input whether to configure binary caches. Definitely say yes.
-3. Download / build whatever is needed for Reflex / GHCJS environment. *This* part will take a while. To give you a general idea, I tried this on the default "hashicorp/precise64" Vagrant box with an internet connection of ~100 Mbit/s (fixed to match mine with [this](https://alexbilbie.com/2014/11/vagrant-dns/)) running on my 2016 Mac and it took about 30 minutes. I'd recommend letting this run in the background while you follow along with the rest of the setup. Keep in mind that this is roughly the lead time to expect if you ever update `reflex-platform` in the future. 
+3. Download / build whatever is needed for Reflex / GHCJS environment. *This* part will take a while. To give you a general idea, I tried this on the default "hashicorp/precise64" Vagrant box with an internet connection of ~100 Mbit/s (fixed to match my usual speed with [this](https://alexbilbie.com/2014/11/vagrant-dns/)) running on my 2016 Mac and it took about 30 minutes. I'd recommend letting this run in the background while you follow along with the rest of the setup. Keep in mind that this is roughly the lead time to expect if you ever update `reflex-platform` in the future. 
 
 One thing you should notice is that the `default.nix` file is re-using the Nix expression from the reflex-platform submodule. We're going to keep this, but know that this means that our entry point will be fundamentally different from the previous posts, where we built it up from scratch. Some settings are pre-filled in this `default.nix`; to see the full list (it's not too long) check the reflex-platform/project/default.nix [here](https://github.com/reflex-frp/reflex-platform/blob/7e002c573a3d7d3224eb2154ae55fc898e67d211/project/default.nix).
 
@@ -74,7 +74,7 @@ reflex-platform.project ({ pkgs, ... }: {
 
 ### Using Nix instead of git submodules
 
-The source skeleton uses a git submodule to "import" the reflex-platform nix file. I had some issues getting this to work in my cloned repo (probably because I wiped the history), but that's fine -- by now we should be pros at importing Nix things! We know (from part 1 of this series) that we can use `fetchFromGitHub` to get a repository, and `nix-prefetch-git` to find the correct sha256 value. Looking at the [skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) again, we see that it's pinning `reflex-platform` that starts with `7e002c5`, so we can run:
+The source skeleton uses a git submodule to "import" the reflex-platform nix file. I had some issues getting this to work in my cloned repo (probably because I wiped the history), but that's fine -- by now we should be pros at importing Nix things! We know (from part 1 of this series) that we can use `fetchFromGitHub` to get a repository, and `nix-prefetch-git` to find the correct sha256 value. Looking at the [skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) again, we see that it's pinning a `reflex-platform` commin that starts with `7e002c5`, so we can run:
 ```bash
 nix-prefetch-git https://github.com/reflex-frp/reflex-platform.git 7e002c5
 ```
@@ -91,7 +91,7 @@ let
 in 
   import reflex-platform {}
 ```
-use this in our `default.nix` by changing line 1 to import this file instead of looking at a sub-folder:
+Use this in our `default.nix` by changing line 1 to import this file instead of looking at a sub-folder:
 ```nix
 { reflex-platform ? import ./reflex-platform.nix {} }:
 ...
@@ -104,7 +104,7 @@ rm .gitmodules
 
 ### Adding Hoogle toggle
 
-Let's also take as input whether hoogle is enabled, so that we don't have to wait for Hoogle to build for other functionality. 
+Let's also take as input whether hoogle is enabled, so that we don't have to wait for Hoogle to build when we don't need it: 
 ```nix
 { reflex-platform ? import ./reflex-platform.nix {}
 , withHoogle ? false
@@ -119,9 +119,9 @@ reflex-platform.project ({ pkgs, ... }: {
 
 ### Wiring in Warp
 
-Warp is what will provide us with a hot-reloading browser window *running GHC* when we save the source code, and will be very useful in our workflow so let's enable that by default. To do that:
+Warp is what will provide us with a hot-reloading browser window *running GHC* when we save the source code. This will be very useful in our workflow, so let's enable that by default. To do that:
 1. Add jsaddle-warp as a dependency of `frontend.cabal`:
-```yml
+```yaml
 ...
 executable frontend
   ...
@@ -132,8 +132,8 @@ executable frontend
   ...
 ...
 ```
-2. Change our `Main.hs` to be "ran" with Jsaddle.Warp instead:
-```haskell
+2. Change our `Main.hs` to be started with Jsaddle.Warp instead:
+```
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
