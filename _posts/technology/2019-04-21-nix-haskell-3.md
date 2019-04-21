@@ -350,11 +350,13 @@ Then put it in your `default.nix` overrides:
 ```nix
 ...
   overrides = self: super: {
-    servant-reflex = pkgs.haskellPackages.callPackage ./nix/servant-reflex.nix { };
+    servant-reflex = self.callPackage ./nix/servant-reflex.nix { };
     ...
   };
 ...
 ```
+
+Make sure to use `callPackage` from `self` ([the final package set](https://nixos.org/nixpkgs/manual/#sec-overlays-definition)) instead of `pkgs.haskellPackages` to make sure the package you're calling is getting any other overridden packages.
 
 ### Pinning through cabal
 
