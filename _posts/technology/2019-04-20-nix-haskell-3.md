@@ -289,6 +289,8 @@ Before pushing, you may want to test out the final ghcjs app by opening it in yo
 open docs/index.html
 ```
 
+Once you push the `docs/` folder, your Haskell GHCJS application will be available at `https://name.github.io/repo-name`. In the case of this repository, that would be https://cah6.github.io/haskell-nix-skeleton-2/. 
+
 I know this method isn't for everybody, but if you have strong counter-opinions to doing this you probably have enough knowledge or desire to host the docs folder elsewhere.
 
 ### All together now
