@@ -1,14 +1,14 @@
 ---
 layout: post
-title: "Exploring Nix & Haskell Part 3: A Frontend Skeleton"
+title: "Exploring Nix & Haskell Part 3: Less Nix, More Reflex"
 modified:
 categories: technology
 excerpt:
 tags: []
 image:
   feature: nix-haskell-banner.png
-date: 2019-04-20T00:00:00
-modified: 2019-04-20T00:00:00
+date: 2019-04-21T00:00:00
+modified: 2019-04-21T00:00:00
 published: true
 ---
 
