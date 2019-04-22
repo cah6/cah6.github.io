@@ -301,7 +301,7 @@ If we don't care about running the tests for this package, whether because it ta
 
 Another reason to use `dontCheck` is if the test suites depend on incompatible packages. The biggest culprit here is the `doctest` package, which [can't build on GHCJS](https://github.com/NixOS/nixpkgs/issues/47437#issuecomment-429657590). For example, the [lens-aeson](https://github.com/lens/lens-aeson/blob/master/lens-aeson.cabal) library has a doctests test-suite, so you'll need to run it through `dontCheck` in order to use it.
 
-### Pinning a library that has a Nix expression
+### Pinning a library through cabal2nix
 
 Let's say we need the `servant-reflex` package now. Adding this to our frontend cabal file and re-entering the GHC shell will fail with:
 ```
@@ -311,21 +311,16 @@ exceptions ==0.8.*,
 http-media ==0.6.*,
 servant >=0.8 && <0.13
 ```
-because this package uses strict bounds on dependencies and the version it decided to use (v0.3.3) doesn't mesh with what we have. The latest commit (v0.3.4) does though, and this library has a Nix derivation in the repository, so we can grab the full info with:
-```bash
-nix-prefetch-git https://github.com/imalsogreg/servant-reflex 4459563
+because this package uses strict bounds on dependencies and the version it decided to use (v0.3.3) doesn't mesh with what we have. The latest commit (v0.3.4) does though, so we can generate a Nix file pointing to the latest commit with:
 ```
-and put the rev/sha256 into a `nix/servant-reflex.nix` file. Note that `callPackage` expects the `fetchFromGitHub` return value, without the `import` like before:
-```nix
-{ bootstrap ? import <nixpkgs> {} }:
-bootstrap.fetchFromGitHub {
-  owner = "imalsogreg";
-  repo  = "servant-reflex";
-  rev = "44595630e2d1597911ecb204e792d17db7e4a4ee";
-  sha256 = "009d8vr6mxfm9czywhb8haq8pwvnl9ha2cdmaagk1hp6q4yhfq1n";
-}
+cabal2nix https://github.com/imalsogreg/servant-reflex > nix/servant-reflex.nix
 ```
-Then put it in your `default.nix` overrides:
+or for a specific commit:
+```
+cabal2nix https://github.com/imalsogreg/servant-reflex --revision ba8d4f8 > nix/servant-reflex.nix
+```
+
+Then call it in our `default.nix` overrides:
 ```nix
 ...
   overrides = self: super: {
@@ -337,27 +332,27 @@ Then put it in your `default.nix` overrides:
 
 Make sure to use `callPackage` from `self` ([the final package set](https://nixos.org/nixpkgs/manual/#sec-overlays-definition)) instead of `pkgs.haskellPackages` to make sure the package you're calling is getting any other overridden packages.
 
-### Pinning through cabal
+### Pinning through the libary's default.nix file
 
-If you need library xyz (you put it in your cabal file and entering the shell fails) and it doesn't have a Nix file, you can also pin it by running `cabal2nix` directly on the GitHub repository. 
-For example, to pin the lastest commit:
-```
-cabal2nix https://github.com/owner/xyz > nix/xyz.nix
-```
-or for a specific commit:
-```
-cabal2nix https://github.com/owner/xyz --revision abcd1234 > nix/xyz.nix
-```
+The `servant-reflex` library has a Nix file defined in its repository, so you might be wondering why we generated our own instead of just using theirs. I tried this first, but encountered a strange issue where including it as a dependency via their Nix file somehow turned off `jsaddle-warp` when my app was launched with GHC. I'm not sure why this happened, but did notice that using their Nix expression pulled in more dependencies since it also tried to satisfy and build the `executable example` section. On the other hand, `cabal2nix` knows that we only want the package as a library, and so will only build the library section of the cabal file.
 
-Then edit your overrides:
+My suggestion would be to be careful using the repository's Nix derivation for packages that provide more than just a `libary` build in the cabal file, and maybe only try the below method if using `cabal2nix` doesn't work with that library. 
+
+If you do need to use their custom Nix file, do that by getting the full rev/sha256 with:
 ```
-...
-  overrides = self: super: {
-    xyz = pkgs.haskellPackages.callPackage ./nix/xyz.nix { };
-    ...
-  };
-...
+nix-prefetch-git https://github.com/imalsogreg/servant-reflex
 ```
+putting that info into the `nix/servant-reflex.nix` file:
+```
+{ bootstrap ? import <nixpkgs> {} }:
+bootstrap.fetchFromGitHub {
+  owner = "imalsogreg";
+  repo  = "servant-reflex";
+  rev = "44595630e2d1597911ecb204e792d17db7e4a4ee";
+  sha256 = "009d8vr6mxfm9czywhb8haq8pwvnl9ha2cdmaagk1hp6q4yhfq1n";
+}
+```
+and then putting the same `callPackage` as the above section in your `default.nix` overrides.
 
 ## Ending Notes
 
@@ -375,4 +370,4 @@ Hopefully this post has helped you get started in making widgets in Haskell and 
 
 If you want to learn more Reflex now that you have a good test environment, I would recommend [the qfpl tutorial](https://blog.qfpl.io/posts/reflex/basics/introduction/) for concepts, [reflex-dom-inbits](https://github.com/hansroland/reflex-dom-inbits/blob/master/tutorial.md) for helpful bits of knowledge, and [the quickref](https://github.com/reflex-frp/reflex/blob/develop/Quickref.md) for a function cheat sheet.
 
-As always, if you'd like to comment on this post please do so in the associated reddit post [here]().
+As always, if you'd like to comment on this post please do so in the associated reddit post [here](https://www.reddit.com/r/haskell/comments/bfriv7/exploring_nix_haskell_part_3_less_nix_more_reflex/).
