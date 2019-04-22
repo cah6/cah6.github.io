@@ -126,35 +126,7 @@ reflex-platform.project ({ pkgs, ... }: {
 
 ### Wiring in Warp
 
-Warp is what will provide us with a hot-reloading browser window *running GHC* when we save the source code. This will be very useful in our workflow, so let's enable that by default. To do that:
-- Add jsaddle-warp as a dependency of `frontend.cabal`:
-
-```yaml
-...
-executable frontend
-  ...
-  build-depends:       base >=4.9 && <4.12
-                     , common
-                     , jsaddle-warp
-                     , reflex-dom
-  ...
-...
-```
-- Change our `Main.hs` to be started with Jsaddle.Warp instead:
-
-```haskell
-{-# LANGUAGE OverloadedStrings #-}
-
-module Main where
-
-import Reflex.Dom.Core
-import Language.Javascript.JSaddle.Warp
-
-main :: IO ()
-main = run 3003 $ mainWidget $ text "Hello!"
-```
-- Set `useWarp = true;` in `default.nix`:
-
+Warp is what will provide us with a hot-reloading browser window *running GHC* when we save the source code. This will be very useful in our workflow, so let's enable that by default. To do that, just set `useWarp = true;` in `default.nix`:
 ```nix
 ...
 reflex-platform.project ({ pkgs, ... }: {
@@ -162,6 +134,13 @@ reflex-platform.project ({ pkgs, ... }: {
   useWarp = true;
 ...
 ```
+which will start it on port 3003 by default. You can change this port by setting the `JSADDLE_WARP_PORT` environment variable. You'll know it's working since it will print out
+```
+Running jsaddle-warp server on port 3003
+```
+when `main` is ran.
+
+Note: you previously had to manually import `jsaddle-warp`, import `Reflex.Dom.Core` instead of `Reflex.Dom`, and wrap `widgetMain` with `run 3003 $` but this shouldn't be necessary anymore.  
 
 ### Miscellaneous cleanup and additions
 
