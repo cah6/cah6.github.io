@@ -100,7 +100,7 @@ in
 ```
 Use this in our `default.nix` by changing line 1 to import this file instead of looking at a sub-folder:
 ```nix
-{ reflex-platform ? import ./reflex-platform.nix {} }:
+{ reflex-platform ? import ./nix/reflex-platform.nix {} }:
 ...
 ```
 and remove the now unnecessary submodule pieces:
