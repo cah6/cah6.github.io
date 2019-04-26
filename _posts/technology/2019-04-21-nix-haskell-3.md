@@ -81,7 +81,7 @@ reflex-platform.project ({ pkgs, ... }: {
 
 ### Using Nix instead of git submodules
 
-The source skeleton uses a git submodule to "import" the reflex-platform nix file. I had some issues getting this to work in my cloned repo (probably because I wiped the history), but that's fine -- by now we should be pros at importing Nix things! We know (from part 1 of this series) that we can use `fetchFromGitHub` to get a repository, and `nix-prefetch-git` to find the correct sha256 value. Looking at the [skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) again, we see that it's pinning a `reflex-platform` commin that starts with `7e002c5`, so we can run:
+The source skeleton uses a git submodule to "import" the reflex-platform nix file. I had some issues getting this to work in my cloned repo (probably because I wiped the history), but that's fine -- by now we should be pros at importing Nix things! We know (from part 1 of this series) that we can use `fetchFromGitHub` to get a repository, and `nix-prefetch-git` to find the correct sha256 value. Looking at the [skeleton](https://github.com/ElvishJerricco/reflex-project-skeleton) again, we see that it's pinning a `reflex-platform` commit that starts with `7e002c5`, so we can run:
 ```bash
 nix-prefetch-git https://github.com/reflex-frp/reflex-platform.git 7e002c5
 ```
